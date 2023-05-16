@@ -1,5 +1,9 @@
 <template>
   <div class="containner" ref="container"></div>
+  <div class="map">
+    <div class="tagDiv" ref="tagDiv"></div>
+    <img src="@/assets/map.gif" alt="" />
+  </div>
 </template>
 <script>
 import * as THREE from "three";
@@ -62,11 +66,31 @@ export default {
 
     // 获取挂载元素
     const container = ref(null);
+    const tagDiv = ref(null);
 
     // 渲染函数
     const render = () => {
       renderer.render(scene, camera); //执行渲染操作
       requestAnimationFrame(render); // 请求动画帧，重复执行渲染函数
+    };
+
+    const tagDivArr = {
+      客厅: [60, 80],
+      厨房: [120, 110],
+      阳台: [20, 15],
+      过道: [90, 35],
+      主卧: [60, 10],
+    };
+
+    const moveTagDiv = (name) => {
+      if (tagDivArr[name]) {
+        gsap.to(tagDiv.value, {
+          duration: 1,
+          x: tagDivArr[name][0],
+          y: tagDivArr[name][1],
+          ease: "power3.inOut",
+        });
+      }
     };
 
     //挂在完毕之后获取dom
@@ -118,6 +142,8 @@ export default {
       const livingRoom = new Room("livingRoom", 0, "./imgs/livingroom");
       // 添加进场景中
       scene.add(livingRoom.cube);
+      console.log(tagDiv.value);
+      tagDiv.value.style.cssText = `transform:translate(60px, 80px)`;
 
       //创建厨房
       // 厨房位置
@@ -152,6 +178,7 @@ export default {
           z: kitchenPosition.z,
           ease: "power3.inOut",
         });
+        moveTagDiv("厨房");
       });
 
       // 创建厨房到客厅导航精灵
@@ -164,7 +191,7 @@ export default {
 
       // 定义厨房到客厅导航精灵点击事件
       livingRoomText.clickFn(() => {
-        // 让相机移动到厨房
+        // 让相机移动到客厅
         gsap.to(camera.position, {
           duration: 1,
           x: 0,
@@ -172,6 +199,7 @@ export default {
           z: 0,
           ease: "power3.inOut",
         });
+        moveTagDiv("客厅");
       });
 
       //创建阳台
@@ -197,6 +225,7 @@ export default {
           z: balconyPosition.z,
           ease: "power3.inOut",
         });
+        moveTagDiv("阳台");
       });
 
       // 创建阳台到客厅导航精灵
@@ -209,7 +238,7 @@ export default {
 
       // 定义阳台到客厅导航精灵点击事件
       livingText2.clickFn(() => {
-        // 让相机移动到阳台
+        // 让相机移动到客厅
         gsap.to(camera.position, {
           duration: 1,
           x: 0,
@@ -217,6 +246,7 @@ export default {
           z: 0,
           ease: "power3.inOut",
         });
+        moveTagDiv("客厅");
       });
 
       // 创建过道
@@ -248,6 +278,7 @@ export default {
           z: corridorPosition.z,
           ease: "power3.inOut",
         });
+        moveTagDiv("过道");
       });
 
       // 创建过道到客厅导航精灵
@@ -268,6 +299,7 @@ export default {
           z: 0,
           ease: "power3.inOut",
         });
+        moveTagDiv("客厅");
       });
 
       // 创建主卧
@@ -301,6 +333,7 @@ export default {
           z: bedRoomPosition.z,
           ease: "power3.inOut",
         });
+        moveTagDiv("主卧");
       });
 
       // 创建主卧到过道导航精灵
@@ -321,11 +354,13 @@ export default {
           z: corridorPosition.z,
           ease: "power3.inOut",
         });
+        moveTagDiv("过道");
       });
     });
 
     return {
-      container, // 必须返回containner 才可以获取到ref元素。
+      container,
+      tagDiv, // 必须返回containner,tagDiv 才可以获取到ref元素。
     };
   },
 };
@@ -341,5 +376,30 @@ export default {
   width: 100vw;
   height: 100vh;
   background: black;
+}
+
+.map {
+  position: absolute;
+  bottom: 0;
+  left: 0.1vw;
+  width: 23.5vh;
+  height: 20vh;
+  pointer-events: none;
+}
+
+.map img {
+  position: absolute;
+  height: 100%;
+}
+
+.map .tagDiv {
+  position: absolute;
+  top: 0px;
+  width: 3vw;
+  height: 3vw;
+  background: url("~@/assets/location.png");
+  background-size: 100% 100%;
+  background-position: center;
+  z-index: 5;
 }
 </style>
