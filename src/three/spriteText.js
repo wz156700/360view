@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+// 创建canvas 精灵标签
 export default class spriteText {
     constructor(text, position = new THREE.Vector3(0, 0, 0), camera) {
         this.callback = [];
@@ -10,6 +11,7 @@ export default class spriteText {
         const context = canvas.getContext("2d");
         context.fillStyle = "rgba(100,100,100,0.7)";
         context.fillRect(0, 256, 1024, 512);
+
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.font = "bold 200px Arail";

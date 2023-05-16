@@ -21,16 +21,19 @@ gsap.registerPlugin(ScrollTrigger, Draggable, Flip);
 
 export default {
   setup() {
-    // 页面宽高
+    // 获取页面宽高
     const width = window.innerWidth; //宽度
     const height = window.innerHeight; //高度
+
     //初始化场景
     const scene = new THREE.Scene();
 
     //设置光照
+
     //环境光:没有特定方向，整体改变场景的光照明暗
     const ambient = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambient);
+
     //点光源
     const pointLight = new THREE.PointLight(0xffffff, 1.0);
     //点光源位置
@@ -44,10 +47,10 @@ export default {
       0.1, // 近裁截面
       10000 // 远裁截面
     );
+    // 设置相机看向的位置
     camera.lookAt(5, 0, -2);
     // 设置相机位置
     camera.position.set(0, 0, 0);
-    // camera.position.z = 800;
 
     // 创建渲染器对象
     const renderer = new THREE.WebGLRenderer({
@@ -55,7 +58,7 @@ export default {
     });
 
     // 定义threejs输出画布的尺寸(单位:像素px)
-    renderer.setSize(width, height); //设置three.js渲染区域的尺寸(像素px)
+    renderer.setSize(width, height);
 
     // 获取挂载元素
     const container = ref(null);
@@ -65,15 +68,6 @@ export default {
       renderer.render(scene, camera); //执行渲染操作
       requestAnimationFrame(render); // 请求动画帧，重复执行渲染函数
     };
-    // // 设置相机控件轨道控制器OrbitControls
-    // const controls = new OrbitControls(camera, renderer.domElement);
-    // // 如果OrbitControls改变了相机参数，重新调用渲染器渲染三维场景
-    // controls.addEventListener("change", function () {
-    //   console.log("13");
-    //   renderer.render(scene, camera); //执行渲染操作
-    //   // 浏览器控制台查看相机位置变化
-    //   console.log("camera.position", camera.position);
-    // }); //监听鼠标、键盘事件
 
     //挂在完毕之后获取dom
     onMounted(() => {
@@ -101,10 +95,14 @@ export default {
         },
         false
       );
+      // 控制相机旋转
       window.addEventListener("mousemove", (event) => {
         if (isMouseDown) {
+          // 绕X轴旋转
           camera.rotation.y += event.movementX * 0.002;
+          // 绕Y轴旋转
           // camera.rotation.x += event.movementY * 0.002;
+          //相机旋转时的顺序
           camera.rotation.order = "YXZ";
         }
       });
@@ -122,7 +120,9 @@ export default {
       scene.add(livingRoom.cube);
 
       //创建厨房
+      // 厨房位置
       let kitchenPosition = new THREE.Vector3(100, 0, 0);
+      // 厨房旋转角度
       let kitchenEuler = new THREE.Euler(0, -Math.PI / 2, 0);
       const kitchen = new Room(
         "kitchen",
@@ -133,6 +133,7 @@ export default {
       );
       // 添加进场景中
       scene.add(kitchen.cube);
+
       // 创建客厅到厨房导航精灵
       let kitchenText = new spriteText(
         "厨房",
@@ -141,7 +142,7 @@ export default {
       );
       scene.add(kitchenText.sprite);
 
-      // 定义厨房导航精灵点击事件
+      // 定义客厅到厨房导航精灵点击事件
       kitchenText.clickFn(() => {
         // 让相机移动到厨房
         gsap.to(camera.position, {
@@ -156,13 +157,12 @@ export default {
       // 创建厨房到客厅导航精灵
       let livingRoomText = new spriteText(
         "客厅",
-        // new THREE.Vector3(-5, 0, 0),
         new THREE.Vector3(95, 0, 1),
         camera
       );
       scene.add(livingRoomText.sprite);
 
-      // 定义厨房导航精灵点击事件
+      // 定义厨房到客厅导航精灵点击事件
       livingRoomText.clickFn(() => {
         // 让相机移动到厨房
         gsap.to(camera.position, {
@@ -176,15 +176,7 @@ export default {
 
       //创建阳台
       let balconyPosition = new THREE.Vector3(-100, 0, 0);
-      // let balconyEuler = new THREE.Euler(0, -Math.PI / 2, 0);
-      const balcony = new Room(
-        "balcony",
-        8,
-        "./imgs/balcony",
-        balconyPosition
-        // balconyEuler
-      );
-
+      const balcony = new Room("balcony", 8, "./imgs/balcony", balconyPosition);
       scene.add(balcony.cube);
 
       // 创建客厅到阳台导航精灵
@@ -195,7 +187,7 @@ export default {
       );
       scene.add(balconyText.sprite);
 
-      // 定义阳台导航精灵点击事件
+      // 定义客厅到阳台导航精灵点击事件
       balconyText.clickFn(() => {
         // 让相机移动到阳台
         gsap.to(camera.position, {
@@ -215,7 +207,7 @@ export default {
       );
       scene.add(livingText2.sprite);
 
-      // 定义阳台导航精灵点击事件
+      // 定义阳台到客厅导航精灵点击事件
       livingText2.clickFn(() => {
         // 让相机移动到阳台
         gsap.to(camera.position, {
@@ -237,7 +229,6 @@ export default {
         corridorPosition,
         corridorEuler
       );
-
       scene.add(corridor.cube);
       // 创建客厅到过道导航精灵
       let corridorText = new spriteText(
@@ -247,9 +238,9 @@ export default {
       );
       scene.add(corridorText.sprite);
 
-      // 定义阳台导航精灵点击事件
+      // 定义客厅到过道导航精灵点击事件
       corridorText.clickFn(() => {
-        // 让相机移动到阳台
+        // 让相机移动到过道
         gsap.to(camera.position, {
           duration: 1,
           x: corridorPosition.x,
@@ -265,11 +256,11 @@ export default {
         new THREE.Vector3(3, 0, -98),
         camera
       );
-      // (2, 0, -95),
       scene.add(corridorText2.sprite);
-      // 定义阳台导航精灵点击事件
+
+      // 定义过道到客厅导航精灵点击事件
       corridorText2.clickFn(() => {
-        // 让相机移动到阳台
+        // 让相机移动到客厅
         gsap.to(camera.position, {
           duration: 1,
           x: 0,
@@ -300,9 +291,9 @@ export default {
       );
       scene.add(bedroomText.sprite);
 
-      // 定义阳台导航精灵点击事件
+      // 定义过道到主卧导航精灵点击事件
       bedroomText.clickFn(() => {
-        // 让相机移动到阳台
+        // 让相机移动到主卧
         gsap.to(camera.position, {
           duration: 1,
           x: bedRoomPosition.x,
@@ -312,17 +303,17 @@ export default {
         });
       });
 
-      // 创建过道到客厅导航精灵
+      // 创建主卧到过道导航精灵
       let bedRoomText2 = new spriteText(
         "过道",
         new THREE.Vector3(98, 0, 90),
         camera
       );
-      // (2, 0, -95),
       scene.add(bedRoomText2.sprite);
-      // 定义阳台导航精灵点击事件
+
+      // 定义主卧到过道导航精灵点击事件
       bedRoomText2.clickFn(() => {
-        // 让相机移动到阳台
+        // 让相机移动到过道
         gsap.to(camera.position, {
           duration: 1,
           x: corridorPosition.x,
@@ -334,7 +325,7 @@ export default {
     });
 
     return {
-      container,
+      container, // 必须返回containner 才可以获取到ref元素。
     };
   },
 };
