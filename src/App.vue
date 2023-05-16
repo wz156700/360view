@@ -4,6 +4,11 @@
     <div class="tagDiv" ref="tagDiv"></div>
     <img src="@/assets/map.gif" alt="" />
   </div>
+  <div class="loading" v-if="progress != 100"></div>
+  <div class="progress" v-if="progress != 100">
+    <img src="@/assets/loading.gif" alt="loading" />
+    <span>加载中：{{ progress }}%</span>
+  </div>
 </template>
 <script>
 import * as THREE from "three";
@@ -20,11 +25,13 @@ import Flip from "gsap/Flip";
 import Draggable from "gsap/Draggable";
 import Room from "./three/room";
 import spriteText from "./three/spriteText";
+
 // 注册插件
 gsap.registerPlugin(ScrollTrigger, Draggable, Flip);
 
 export default {
   setup() {
+    let progress = ref(0);
     // 获取页面宽高
     const width = window.innerWidth; //宽度
     const height = window.innerHeight; //高度
@@ -357,10 +364,18 @@ export default {
         moveTagDiv("过道");
       });
     });
+    THREE.DefaultLoadingManager.onProgress = function (
+      url,
+      itemsLoaded,
+      itemsTotal
+    ) {
+      progress.value = (new Number(itemsLoaded / itemsTotal) * 100).toFixed(2);
+    };
 
     return {
       container,
       tagDiv, // 必须返回containner,tagDiv 才可以获取到ref元素。
+      progress,
     };
   },
 };
@@ -401,5 +416,47 @@ export default {
   background-size: 100% 100%;
   background-position: center;
   z-index: 5;
+}
+
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url(~@/assets/loading.png);
+  background-size: cover;
+  filter: blur(50px); /** 模糊处理 */
+  z-index: 100;
+}
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 101;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #fff;
+}
+.progress > img {
+  padding: 0 15px;
+}
+
+.title {
+  width: 180px;
+  height: 40px;
+  position: fixed;
+  right: 100px;
+  top: 50px;
+  background-color: rgba(0, 0, 0, 0.5);
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+  border-radius: 5px;
+  z-index: 110;
 }
 </style>
